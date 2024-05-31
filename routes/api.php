@@ -36,7 +36,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/', 'App\Http\Controllers\Api\UserController@index');
         Route::get('{id}', 'App\Http\Controllers\Api\UserController@show');
         Route::patch('edit', 'App\Http\Controllers\Api\UserController@update');
-        Route::delete('delete/{id}', 'App\Http\Controllers\Api\UserController@destroy');
+        Route::delete('delete', 'App\Http\Controllers\Api\UserController@destroy');
     });
 
     Route::group(['prefix' => 'tasks', 'middleware' => 'api'], function () {
@@ -54,13 +54,5 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('create', 'App\Http\Controllers\Api\CardController@store');
         Route::patch('edit/{id}', 'App\Http\Controllers\Api\CardController@update');
         Route::delete('delete/{id}', 'App\Http\Controllers\Api\CardController@destroy');
-    });
-
-    Route::group(['prefix' => 'desk_lists', 'middleware' => 'api'], function () {
-        Route::get('/', 'App\Http\Controllers\Api\DeskListController@index');
-        Route::get('{id}', 'App\Http\Controllers\Api\DeskListController@show');
-        Route::post('create', 'App\Http\Controllers\Api\DeskListController@store');
-        Route::patch('edit/{id}', 'App\Http\Controllers\Api\DeskListController@update');
-        Route::delete('delete/{id}', 'App\Http\Controllers\Api\DeskListController@destroy');
     });
 });

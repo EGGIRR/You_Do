@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Desk;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use function PHPUnit\Framework\isEmpty;
 
 class DeskController extends Controller
 {
@@ -12,7 +16,7 @@ class DeskController extends Controller
      */
     public function index()
     {
-        //
+        return Desk::all();
     }
 
     /**
@@ -28,7 +32,26 @@ class DeskController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255|unique:desks,name',
+            'description' => 'required|string|max:255',
+        ], [
+            'name.unique' => 'The name has already been taken.',
+            'name.required' => 'The name field is required.',
+            'name.string' => 'The name must be a string.',
+            'name.max' => 'The name may not be greater than 255 characters.',
+            'description.string' => 'The description must be a string.',
+            'description.required' => 'The description field is required.',
+            'description.max' => 'The description may not be greater than 255 characters.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(["message" => "Validation error!", 'errors' => $validator->errors()], 422);
+        }
+        $data = $request->all();
+        $data['user_id'] = Auth::id();
+        $created_desk = Desk::create($data);
+        return response()->json(["message" => "Desk created!", "data" => $created_desk], 201);
     }
 
     /**
@@ -36,7 +59,10 @@ class DeskController extends Controller
      */
     public function show(string $id)
     {
-        //
+        if (!Desk::find($id)) {
+            return response()->json(['message' => 'Desk not found'], 404);
+        }else
+        return response()->json(['data' => ['desk' => Desk::find($id)]]);
     }
 
     /**
@@ -52,7 +78,25 @@ class DeskController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $desk = Desk::find($id);
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'string|max:255|unique:desks,name',
+            'description' => 'string|max:255',
+        ], [
+            'name.unique' => 'The name has already been taken.',
+            'name.string' => 'The name must be a string.',
+            'name.max' => 'The name may not be greater than 255 characters.',
+            'description.string' => 'The description must be a string.',
+            'description.max' => 'The description may not be greater than 255 characters.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(["message" => "Validation error!", 'errors' => $validator->errors()], 422);
+        }
+        $desk->update($request->all());
+
+        return response()->json(["message" => "Desk updated!", "data" => $desk]);
     }
 
     /**
@@ -60,6 +104,11 @@ class DeskController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $desk = Desk::find($id);
+        if (!$desk) {
+            return response()->json(['message' => 'Desk not found'], 404);
+        }
+        $desk->delete();
+        return response()->json(['message' => 'Desk deleted']);
     }
 }

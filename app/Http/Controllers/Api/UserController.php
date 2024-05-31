@@ -31,7 +31,7 @@ class UserController extends Controller
             $token = User::where(['email' => $request->email])->first()->generateToken();
             return response()->json(['data' => ['token' => $token]]);
         } else {
-            return response()->json(['data' => ['message' => 'login failed']],401);
+            return response()->json(['data' => ['message' => 'login failed']], 401);
         }
     }
 
@@ -40,6 +40,7 @@ class UserController extends Controller
         Auth::user()->logout();
         return response()->json(['data' => ['message' => 'logout']]);
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -84,10 +85,7 @@ class UserController extends Controller
 
         $createdUser = User::create($request->all());
 
-        return response()->json([
-            "message" => "User created!",
-            "data" => $createdUser
-        ], 201);
+        return response()->json(["message" => "User created!", "data" => $createdUser], 201);
     }
 
     /**
@@ -95,7 +93,10 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        return User::find($id);
+        if (!User::find($id)) {
+            return response()->json(['message' => 'User not found'], 404);
+        }else
+        return response()->json(["data" => ['user' => User::find($id)]]);
     }
 
     /**
@@ -146,8 +147,10 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy()
     {
-        //
+        $user = Auth::user();
+        $user->delete();
+        return response()->json(['message' => 'User deleted']);
     }
 }
