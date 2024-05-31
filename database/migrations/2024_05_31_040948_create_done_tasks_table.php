@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('description');
             $table->date('expired_date');
+            $table->date('done_date')->default(now());
             $table->boolean('expired');
             $table->foreignId('task_id')->constrained('tasks')->onDelete('cascade');
             $table->timestamps();

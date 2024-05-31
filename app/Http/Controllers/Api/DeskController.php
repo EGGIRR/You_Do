@@ -7,7 +7,6 @@ use App\Models\Desk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use function PHPUnit\Framework\isEmpty;
 
 class DeskController extends Controller
 {
@@ -16,7 +15,7 @@ class DeskController extends Controller
      */
     public function index()
     {
-        return Desk::all();
+        return response()->json(['data' => ['desks' => Desk::all()]]);
     }
 
     /**

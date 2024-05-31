@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\DoneTask;
 use Illuminate\Http\Request;
 
 class DoneTaskController extends Controller
@@ -12,7 +13,7 @@ class DoneTaskController extends Controller
      */
     public function index()
     {
-        //
+        return response()->json(['data' => ['done_tasks' => DoneTask::all()]]);
     }
 
     /**

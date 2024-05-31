@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('description');
+            $table->boolean('complete')->default(false);
+            $table->boolean('important')->default(false);
             $table->date('expired_date');
-            $table->boolean('expired')->default(false);
             $table->foreignId('card_id')->constrained('cards')->onDelete('cascade');;
             $table->timestamps();
         });
