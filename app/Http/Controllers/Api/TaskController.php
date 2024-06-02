@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\DoneTask;
 use App\Models\Task;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -14,21 +13,22 @@ class TaskController extends Controller
     public function complete(string $id)
     {
         $task = Task::find($id);
-        $task->complete = true;
-        $task->save();
-        $doneTask = new DoneTask;
-        $doneTask->name = $task->name;
-        $doneTask->description = $task->description;
-        $doneTask->expired_date = $task->expired_date;
-        if ($task->expired_date < Carbon::now()) {
-            $doneTask->expired = true;
+        if ($task) {
+            if (!$task->complete) {
+                $task->complete = true;
+                if ($task->expired_date < Carbon::now()) {
+                    $task->expired = true;
+                } else {
+                    $task->expired = false;
+                }
+                $task->save();
+                return response()->json(["message" => "Task completed!", "data" => $task]);
+            } else {
+                return response()->json(["message" => "Task already completed!"]);
+            }
         } else {
-            $doneTask->expired = false;
+            return response()->json(["message" => "Task not found!"]);
         }
-        $doneTask->done_date = Carbon::now()->format('Y-m-d');
-        $doneTask->task_id = $id;
-        $doneTask->save();
-        return response()->json(["message" => "Task completed and moved to DoneTask!", "data" => $doneTask]);
     }
 
     /**
@@ -38,6 +38,23 @@ class TaskController extends Controller
     {
         return response()->json(['data' => ['tasks' => Task::all()]]);
     }
+    public function uncompletedTasks()
+    {
+        $task = Task::where('complete', false)->get();
+        return response()->json(['data' => ['tasks' => $task]]);
+    }
+    public function completedTasks()
+    {
+        $task = Task::where('complete', true)->get();
+        return response()->json(['data' => ['tasks' => $task]]);
+    }
+    public function importantTasks()
+    {
+        $task = Task::where('important', true)
+            ->where('complete', false)->get();
+        return response()->json(['data' => ['tasks' => $task]]);
+    }
+
 
     /**
      * Show the form for creating a new resource.

@@ -41,6 +41,9 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::group(['prefix' => 'tasks', 'middleware' => 'api'], function () {
         Route::get('/', 'App\Http\Controllers\Api\TaskController@index');
+        Route::get('/uncompleted', 'App\Http\Controllers\Api\TaskController@uncompletedTasks');
+        Route::get('/completed', 'App\Http\Controllers\Api\TaskController@completedTasks');
+        Route::get('/important', 'App\Http\Controllers\Api\TaskController@importantTasks');
         Route::get('{id}', 'App\Http\Controllers\Api\TaskController@show');
         Route::post('create', 'App\Http\Controllers\Api\TaskController@store');
         Route::patch('edit/{id}', 'App\Http\Controllers\Api\TaskController@update');
