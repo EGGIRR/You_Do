@@ -66,6 +66,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:8',
+            'avatar' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
         ], [
             'name.required' => 'The name field is required.',
             'name.string' => 'The name must be a string.',
@@ -80,10 +81,17 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(["message" => "Validation error!", 'errors' => $validator->errors()], 422,);
+            return response()->json(["message" => "Validation error!", 'errors' => $validator->errors()], 422);
         }
 
-        $createdUser = User::create($request->all());
+        if ($request->hasFile('avatar')) {
+            $avatar = $request->file('avatar');
+            $path = $avatar->store('avatars', 'public');
+            $userData = $request->except('avatar');
+            $userData['avatar'] = $path;
+        }
+
+        $createdUser = User::create($userData);
 
         return response()->json(["message" => "User created!", "data" => $createdUser], 201);
     }
@@ -95,8 +103,8 @@ class UserController extends Controller
     {
         if (!User::find($id)) {
             return response()->json(['message' => 'User not found'], 404);
-        }else
-        return response()->json(["data" => ['user' => User::find($id)]]);
+        } else
+            return response()->json(["data" => ['user' => User::find($id)]]);
     }
 
     /**
@@ -105,6 +113,45 @@ class UserController extends Controller
     public function edit(string $id)
     {
         //
+    }
+
+    /**
+     * Update the user's avatar.
+     */
+    public function updateAvatar(Request $request)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ], [
+            'avatar.required' => 'The avatar field is required.',
+            'avatar.image' => 'The avatar must be an image.',
+            'avatar.mimes' => 'The avatar must be a file of type: jpeg, png, jpg, gif.',
+            'avatar.max' => 'The avatar may not be greater than 2048 kilobytes.'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(["message" => "Validation error!", 'errors' => $validator->errors()], 422);
+        }
+
+        if ($request->hasFile('avatar')) {
+            $avatar = $request->file('avatar');
+            $path = $avatar->store('avatars', 'public');
+            $user->avatar = $path;
+            $user->save();
+
+            return response()->json([
+                "message" => "Avatar updated!",
+                "data" => $user
+            ]);
+        } else {
+            return response()->json(['message' => 'Avatar not provided'], 400);
+        }
     }
 
     /**
