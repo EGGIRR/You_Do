@@ -51,10 +51,6 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('complete/{id}', 'App\Http\Controllers\Api\TaskController@complete');
     });
 
-    Route::group(['prefix' => 'done_tasks', 'middleware' => 'api'], function () {
-        Route::get('/', 'App\Http\Controllers\Api\DoneTaskController@index');
-    });
-
     Route::group(['prefix' => 'cards', 'middleware' => 'api'], function () {
         Route::get('/', 'App\Http\Controllers\Api\CardController@index');
         Route::get('{id}', 'App\Http\Controllers\Api\CardController@show');
