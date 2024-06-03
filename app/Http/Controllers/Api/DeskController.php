@@ -15,7 +15,8 @@ class DeskController extends Controller
      */
     public function index()
     {
-        return response()->json(['data' => ['desks' => Desk::all()]]);
+        $desks = Desk::where('user_id', Auth::id())->get();
+        return response()->json(['data' => ['desks' => $desks]]);
     }
 
     /**
@@ -32,10 +33,9 @@ class DeskController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:desks,name',
+            'name' => 'required|string|max:255',
             'description' => 'required|string|max:255',
         ], [
-            'name.unique' => 'The name has already been taken.',
             'name.required' => 'The name field is required.',
             'name.string' => 'The name must be a string.',
             'name.max' => 'The name may not be greater than 255 characters.',
@@ -80,10 +80,9 @@ class DeskController extends Controller
         $desk = Desk::find($id);
 
         $validator = Validator::make($request->all(), [
-            'name' => 'string|max:255|unique:desks,name',
+            'name' => 'string|max:255',
             'description' => 'string|max:255',
         ], [
-            'name.unique' => 'The name has already been taken.',
             'name.string' => 'The name must be a string.',
             'name.max' => 'The name may not be greater than 255 characters.',
             'description.string' => 'The description must be a string.',
