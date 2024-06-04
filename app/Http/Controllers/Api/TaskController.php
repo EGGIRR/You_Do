@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Desk;
 use App\Models\Task;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -44,9 +43,6 @@ class TaskController extends Controller
         return response()->json(["message" => "Task completed!", "data" => $task]);
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $tasks = DB::table('tasks')
@@ -56,6 +52,46 @@ class TaskController extends Controller
             ->where('desks.user_id', Auth::user()->id)
             ->get();
         return response()->json(['data' => ['tasks' => $tasks]]);
+    }
+    public function taskImportant(string $id){
+        $mytasks = DB::table('tasks')
+            ->join('cards', 'tasks.card_id', '=', 'cards.id')
+            ->join('desks', 'cards.desk_id', '=', 'desks.id')
+            ->select('tasks.*')
+            ->where('desks.user_id', Auth::user()->id)
+            ->pluck('id')
+            ->all();
+
+        if (!in_array($id, $mytasks)) {
+            return response()->json(["message" => "Task not found in your tasks!"], 404);
+        }
+        $task = Task::find($id);
+        if (!$task) {
+            return response()->json(["message" => "Task not found!"], 404);
+        }
+        if($task->important){
+            $task->important = false;
+            $task->save();
+            return response()->json(["message" => "Task deleted from favorites!", "data" => $task]);
+        }else{
+            $task->important = true;
+            $task->save();
+            return response()->json(["message" => "Task in favorites!", "data" => $task]);
+        }
+
+    }
+
+    public function importantTasks()
+    {
+        $task = DB::table('tasks')
+            ->join('cards', 'tasks.card_id', '=', 'cards.id')
+            ->join('desks', 'cards.desk_id', '=', 'desks.id')
+            ->select('tasks.*')
+            ->where('desks.user_id', Auth::user()->id)
+            ->where('tasks.complete', false)
+            ->where('tasks.important', true)
+            ->get();
+        return response()->json(['data' => ['tasks' => $task]]);
     }
     public function uncompletedTasks()
     {
@@ -80,31 +116,6 @@ class TaskController extends Controller
             ->get();
         return response()->json(['data' => ['tasks' => $task]]);
     }
-    public function importantTasks()
-    {
-        $task = DB::table('tasks')
-            ->join('cards', 'tasks.card_id', '=', 'cards.id')
-            ->join('desks', 'cards.desk_id', '=', 'desks.id')
-            ->select('tasks.*')
-            ->where('desks.user_id', Auth::user()->id)
-            ->where('tasks.complete', false)
-            ->where('tasks.important', true)
-            ->get();
-        return response()->json(['data' => ['tasks' => $task]]);
-    }
-
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -145,28 +156,6 @@ class TaskController extends Controller
         return response()->json(["message" => "Task created!", "data" => $created_desk], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        if (!Task::find($id)) {
-            return response()->json(['message' => 'Task not found'], 404);
-        } else
-            return response()->json(['data' => ['task' => Task::find($id)]]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $mytasks = DB::table('tasks')
@@ -216,9 +205,6 @@ class TaskController extends Controller
         return response()->json(["message" => "Task updated!", "data" => $task]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         $mytasks = DB::table('tasks')

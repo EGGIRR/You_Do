@@ -10,26 +10,13 @@ use Illuminate\Support\Facades\Validator;
 
 class DeskController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $desks = Desk::where('user_id', Auth::id())->get();
+        $desks = Desk::select('desks.id','desks.name','desks.description')
+        ->where('user_id', Auth::id())->get();
         return response()->json(['data' => ['desks' => $desks]]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -53,28 +40,6 @@ class DeskController extends Controller
         return response()->json(["message" => "Desk created!", "data" => $created_desk], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        if (!Desk::find($id)) {
-            return response()->json(['message' => 'Desk not found'], 404);
-        }else
-        return response()->json(['data' => ['desk' => Desk::find($id)]]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $desk = Desk::find($id);
@@ -97,9 +62,6 @@ class DeskController extends Controller
         return response()->json(["message" => "Desk updated!", "data" => $desk]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         $desk = Desk::find($id);

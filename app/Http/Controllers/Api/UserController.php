@@ -41,25 +41,6 @@ class UserController extends Controller
         return response()->json(['data' => ['message' => 'logout']]);
     }
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        return User::all();
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -89,35 +70,14 @@ class UserController extends Controller
             $path = $avatar->store('avatars', 'public');
             $userData = $request->except('avatar');
             $userData['avatar'] = $path;
+            $createdUser = User::create($userData);
+        }else{
+            $createdUser = User::create($request->all());
         }
-
-        $createdUser = User::create($userData);
 
         return response()->json(["message" => "User created!", "data" => $createdUser], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        if (!User::find($id)) {
-            return response()->json(['message' => 'User not found'], 404);
-        } else
-            return response()->json(["data" => ['user' => User::find($id)]]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the user's avatar.
-     */
     public function updateAvatar(Request $request)
     {
         $user = Auth::user();
@@ -154,9 +114,6 @@ class UserController extends Controller
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request)
     {
         $user = Auth::user();
@@ -191,9 +148,6 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy()
     {
         $user = Auth::user();

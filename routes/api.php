@@ -26,15 +26,12 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::group(['prefix' => 'desks', 'middleware' => 'api'], function () {
         Route::get('/', 'App\Http\Controllers\Api\DeskController@index');
-        Route::get('{id}', 'App\Http\Controllers\Api\DeskController@show');
         Route::post('create', 'App\Http\Controllers\Api\DeskController@store');
         Route::patch('edit/{id}', 'App\Http\Controllers\Api\DeskController@update');
         Route::delete('delete/{id}', 'App\Http\Controllers\Api\DeskController@destroy');
     });
 
     Route::group(['prefix' => 'users', 'middleware' => 'api'], function () {
-        Route::get('/', 'App\Http\Controllers\Api\UserController@index');
-        Route::get('{id}', 'App\Http\Controllers\Api\UserController@show');
         Route::patch('edit', 'App\Http\Controllers\Api\UserController@update');
         Route::post('edit/avatar', 'App\Http\Controllers\Api\UserController@updateAvatar');
         Route::delete('delete', 'App\Http\Controllers\Api\UserController@destroy');
@@ -45,7 +42,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/uncompleted', 'App\Http\Controllers\Api\TaskController@uncompletedTasks');
         Route::get('/completed', 'App\Http\Controllers\Api\TaskController@completedTasks');
         Route::get('/important', 'App\Http\Controllers\Api\TaskController@importantTasks');
-        Route::get('{id}', 'App\Http\Controllers\Api\TaskController@show');
+        Route::post('/important/{id}', 'App\Http\Controllers\Api\TaskController@taskImportant');
         Route::post('create', 'App\Http\Controllers\Api\TaskController@store');
         Route::patch('edit/{id}', 'App\Http\Controllers\Api\TaskController@update');
         Route::delete('delete/{id}', 'App\Http\Controllers\Api\TaskController@destroy');
@@ -54,7 +51,6 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::group(['prefix' => 'cards', 'middleware' => 'api'], function () {
         Route::get('/', 'App\Http\Controllers\Api\CardController@index');
-        Route::get('{id}', 'App\Http\Controllers\Api\CardController@show');
         Route::post('create', 'App\Http\Controllers\Api\CardController@store');
         Route::patch('edit/{id}', 'App\Http\Controllers\Api\CardController@update');
         Route::delete('delete/{id}', 'App\Http\Controllers\Api\CardController@destroy');
