@@ -77,6 +77,17 @@ class UserController extends Controller
 
         return response()->json(["message" => "User created!", "data" => $createdUser], 201);
     }
+    public function avatar()
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+        $avatar = $user->avatar;
+        $filePath = storage_path('app/public/'. $avatar);
+        return response()->file($filePath);
+    }
 
     public function updateAvatar(Request $request)
     {

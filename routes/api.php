@@ -32,6 +32,7 @@ Route::middleware(['auth:api'])->group(function () {
     });
 
     Route::group(['prefix' => 'users', 'middleware' => 'api'], function () {
+        Route::get('avatar', 'App\Http\Controllers\Api\UserController@avatar');
         Route::patch('edit', 'App\Http\Controllers\Api\UserController@update');
         Route::post('edit/avatar', 'App\Http\Controllers\Api\UserController@updateAvatar');
         Route::delete('delete', 'App\Http\Controllers\Api\UserController@destroy');
